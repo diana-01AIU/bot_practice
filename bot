@@ -1,0 +1,85 @@
+import telebot
+import config
+from telebot import types
+import random
+
+from telebot import types
+
+bot = telebot.TeleBot(config.TOKEN)
+
+
+@bot.message_handler(commands=['start'])
+def welcome(message):
+   # sti = open('static/web.jpg', 'rb')
+   # bot.send_sticker(message.chat.id, sti)
+
+    # KEYBOARD
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
+    item1 = types.KeyboardButton('Краткая информация')
+    item2 = types.KeyboardButton('Наши услуги')
+    markup.add(item1, item2)
+
+    bot.send_message(message.chat.id,
+                     "Здравствуйте, {0.first_name}!\nк вашим услугам - <b>{1.first_name}</b>, рады вам помочь.".format(
+                         message.from_user, bot.get_me()),
+                     parse_mode='html', reply_markup=markup)
+
+
+@bot.message_handler(content_types=['text'])
+def chanse(message):
+    if message.chat.type == 'private':
+        if message.text == 'Краткая информация':
+            bot.send_message(message.chat.id, 'Нотариус Шукеев Г.Е. работает по адресу *****, * этаж; *** офис в Нур-Султане (Астане). Основная область деятельности "Юридические, финансовые, бизнес-услуги" и "Нотариальные услуги".Рабочий телефон для связи +7-707-000-00-10. График работы Пн-Вс 09:00-19:00')
+
+        elif message.text == 'Наши услуги':
+
+            markup = types.InlineKeyboardMarkup(row_width=1)
+            item1 = types.InlineKeyboardButton("Удостоверение сделок (договоров)", callback_data='1')
+            item2 = types.InlineKeyboardButton("Составление завещаний", callback_data='2')
+            item3 = types.InlineKeyboardButton("Выдача свидетельств о праве на наследство", callback_data='3')
+            item4 = types.InlineKeyboardButton("Удостоверение доверенностей", callback_data='4')
+            item5 = types.InlineKeyboardButton("Выдача свидетельств", callback_data='5')
+            markup.add(item1, item2, item3, item4, item5)
+
+            bot.send_message(message.chat.id, 'Наши услуги', reply_markup=markup)
+
+        else:
+            bot.send_message(message.chat.id, 'Извините, насчет данного вопроса просим связаться по указанному номеру')
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_inline(call):
+    try:
+        if call.message:
+            if call.data == '1':
+                bot.send_message(call.message.chat.id,
+                                 'Просим предоставить полную информацию по номеру 8-***-***-*** и обговорить уровень сложности.')
+            elif call.data == '2':
+                bot.send_message(call.message.chat.id, 'Просим предоставить полную информацию по номеру 8-***-***-*** и обговорить уровень сложности.'
+                                                       'Стоимость : **** тг')
+            elif call.data == '3':
+                bot.send_message(call.message.chat.id,'Просим предоставить полную информацию по номеру 8-***-***-*** и обговорить уровень сложности.'
+                                                       'Стоимость : **** тг')
+            elif call.data == '4':
+                bot.send_message(call.message.chat.id,
+                                 'Просим предоставить полную информацию по номеру 8-***-***-*** и обговорить уровень сложности.'
+                                                       'Стоимость : **** тг')
+            elif call.data == '5':
+                bot.send_message(call.message.chat.id, 'Просим предоставить полную информацию по номеру 8-***-***-*** и обговорить уровень сложности.'
+                                                       'Стоимость : **** тг')
+
+            # remove inline buttons
+            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Наши услуги",
+                                  reply_markup=None)
+            # show alert
+            bot.answer_callback_query(callback_query_id=call.id, show_alert=False,
+                                      text="test")
+
+
+
+    except Exception as e:
+        print(repr(e))
+
+    # RUN
+
+
+bot.polling(none_stop=True)
